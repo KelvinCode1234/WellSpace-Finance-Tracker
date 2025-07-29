@@ -28,8 +28,8 @@ export function ExpenseList({ expenses, onEdit, onDelete, formatCurrency }: Expe
           <TableHeader>
             <TableRow>
               <TableHead>Description</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="hidden sm:table-cell">Category</TableHead>
+              <TableHead className="hidden md:table-cell">Date</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
@@ -38,9 +38,14 @@ export function ExpenseList({ expenses, onEdit, onDelete, formatCurrency }: Expe
             {sortedExpenses.length > 0 ? (
               sortedExpenses.map((expense) => (
                 <TableRow key={expense.id}>
-                  <TableCell className="font-medium">{expense.description}</TableCell>
-                  <TableCell className="text-muted-foreground">{expense.category}</TableCell>
-                  <TableCell className="text-muted-foreground">{new Date(expense.date).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <div className="font-medium">{expense.description}</div>
+                    <div className="text-xs text-muted-foreground sm:hidden">
+                      {expense.category} - {new Date(expense.date).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell text-muted-foreground">{expense.category}</TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">{new Date(expense.date).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right font-mono">- {formatCurrency(expense.amount)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -99,4 +104,3 @@ export function ExpenseList({ expenses, onEdit, onDelete, formatCurrency }: Expe
     </>
   );
 }
-

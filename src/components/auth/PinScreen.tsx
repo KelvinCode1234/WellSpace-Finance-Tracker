@@ -49,8 +49,8 @@ export default function PinScreen({ mode, onPinSet, onPinEnter, storedPin }: Pin
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="w-full max-w-sm mx-4">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
             <LockKeyhole className="w-8 h-8 text-primary" />
