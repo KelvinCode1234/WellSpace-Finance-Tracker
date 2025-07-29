@@ -27,11 +27,12 @@ const prompt = ai.definePrompt({
   name: 'suggestCategoryPrompt',
   input: {schema: SuggestCategoryInputSchema},
   output: {schema: SuggestCategoryOutputSchema},
-  prompt: `You are an expert financial assistant. Based on the following expense description, suggest a single, relevant category.
+  prompt: `You are an expert financial assistant. Your task is to accurately categorize an expense based on its description.
 
+Analyze the following expense description and determine the most appropriate category for it.
 Description: {{{prompt}}}
 
-Choose from one of the following categories if applicable, otherwise provide a suitable one-word category:
+Your response should be a single, relevant category. If applicable, choose from the following list, otherwise provide a suitable one-word category:
 Food, Transport, Utilities, Rent, Health, Entertainment, Shopping, Education, Groceries, Other.`,
 });
 
