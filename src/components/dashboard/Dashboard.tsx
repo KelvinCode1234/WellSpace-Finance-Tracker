@@ -99,7 +99,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 sm:px-6 backdrop-blur">
           <div className="flex items-center gap-2">
             <Wallet className="h-6 w-6 text-primary" />
-            <h1 className="text-lg md:text-xl font-semibold text-primary">WellSpace Finance Tracker</h1>
+            <h1 className="text-base md:text-xl font-semibold text-primary">WellSpace Finance</h1>
           </div>
           <div className="ml-auto">
             <Button variant="ghost" size="icon" onClick={onLogout} aria-label="Log out">
@@ -109,11 +109,11 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         </header>
 
         <main className="flex-1 p-4 sm:p-6 space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard title="Total Income" value={formatCurrency(income)} icon={Landmark} onClick={() => { setTempIncome(income); setIsIncomeModalOpen(true); }} />
             <StatsCard title="Total Expenses" value={formatCurrency(totalExpenses)} icon={ArrowRightLeft} />
             <StatsCard title="Savings Goal" value={formatCurrency(savingsGoal)} icon={PiggyBank} onClick={() => { setTempSavingsGoal(savingsGoal); setIsSavingsModalOpen(true); }}/>
-            <Card className="bg-primary text-primary-foreground sm:col-span-2 lg:col-span-1">
+            <Card className="bg-primary text-primary-foreground">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
               </CardHeader>
@@ -126,7 +126,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
             </Card>
           </div>
           
-          <div className="grid gap-6 md:grid-cols-5">
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-5">
             <div className="md:col-span-2 space-y-6">
               <ExpenseChart expenses={expenses} />
                <Card>
@@ -140,7 +140,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
             </div>
             <div className="md:col-span-3 space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h2 className="text-2xl font-semibold">Recent Expenses</h2>
+                <h2 className="text-xl md:text-2xl font-semibold">Recent Expenses</h2>
                 <Button onClick={handleOpenForm} className="w-full sm:w-auto">
                   <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
                 </Button>
