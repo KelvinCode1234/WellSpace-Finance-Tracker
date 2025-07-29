@@ -11,6 +11,7 @@ import { StatsCard } from './StatsCard';
 import type { Expense } from '@/lib/types';
 import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '../ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DashboardProps {
   onLogout: () => void;
