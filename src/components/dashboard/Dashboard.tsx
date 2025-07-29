@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Landmark, ArrowRightLeft, PiggyBank, PlusCircle, LogOut, Wallet } from 'lucide-react';
+import { Landmark, ArrowRightLeft, PiggyBank, PlusCircle, LogOut, Wallet, FileDown } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { ExpenseForm } from './ExpenseForm';
 import { ExpenseList } from './ExpenseList';
@@ -39,17 +39,6 @@ export default function Dashboard({ onLogout }: DashboardProps) {
   const totalExpenses = useMemo(() => expenses.reduce((sum, e) => sum + e.amount, 0), [expenses]);
   const balance = useMemo(() => income - totalExpenses, [income, totalExpenses]);
 
-  const monthlyExpenses = useMemo(() => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    return expenses
-      .filter(expense => {
-        const expenseDate = new Date(expense.date);
-        return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
-      })
-      .reduce((sum, e) => sum + e.amount, 0);
-  }, [expenses]);
-  
   useEffect(() => {
     setTempIncome(income);
   }, [income]);
@@ -92,6 +81,38 @@ export default function Dashboard({ onLogout }: DashboardProps) {
     setSavingsGoal(tempSavingsGoal);
     setIsSavingsModalOpen(false);
   };
+  
+  const handleExport = () => {
+    if (expenses.length === 0) {
+      // Or show a toast message
+      alert("No expenses to export.");
+      return;
+    }
+    
+    const headers = ["ID", "Description", "Amount", "Category", "Date"];
+    const csvContent = [
+      headers.join(","),
+      ...expenses.map(e => [
+        e.id,
+        `"${e.description.replace(/"/g, '""')}"`, // Handle quotes in description
+        e.amount,
+        e.category,
+        e.date
+      ].join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.href) {
+      URL.revokeObjectURL(link.href);
+    }
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", "expenses.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <>
@@ -129,21 +150,18 @@ export default function Dashboard({ onLogout }: DashboardProps) {
           <div className="grid gap-6 grid-cols-1 md:grid-cols-5">
             <div className="md:col-span-2 space-y-6">
               <ExpenseChart expenses={expenses} />
-               <Card>
-                <CardHeader>
-                  <CardTitle>This Month's Expenses</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">{formatCurrency(monthlyExpenses)}</p>
-                </CardContent>
-              </Card>
             </div>
             <div className="md:col-span-3 space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className="text-xl md:text-2xl font-semibold">Recent Expenses</h2>
-                <Button onClick={handleOpenForm} className="w-full sm:w-auto">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
-                </Button>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button onClick={handleOpenForm} className="w-full sm:w-auto">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
+                  </Button>
+                  <Button onClick={handleExport} variant="outline" className="w-full sm:w-auto">
+                    <FileDown className="mr-2 h-4 w-4" /> Export
+                  </Button>
+                </div>
               </div>
               <ExpenseList expenses={expenses} onEdit={handleEditExpense} onDelete={handleDeleteExpense} formatCurrency={formatCurrency} />
             </div>
