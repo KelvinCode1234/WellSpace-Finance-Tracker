@@ -37,6 +37,9 @@ export function ExpenseChart({ expenses }: ExpenseChartProps) {
                   backgroundColor: "hsl(var(--background))",
                   borderColor: "hsl(var(--border))",
                 }}
+                itemStyle={{
+                    color: "hsl(var(--foreground))"
+                }}
               />
               <Pie
                 data={chartData}
