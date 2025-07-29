@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -12,9 +13,10 @@ interface ExpenseListProps {
   expenses: Expense[];
   onEdit: (expense: Expense) => void;
   onDelete: (id: string) => void;
+  formatCurrency: (value: number) => string;
 }
 
-export function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
+export function ExpenseList({ expenses, onEdit, onDelete, formatCurrency }: ExpenseListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -39,7 +41,7 @@ export function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
                   <TableCell className="font-medium">{expense.description}</TableCell>
                   <TableCell className="text-muted-foreground">{expense.category}</TableCell>
                   <TableCell className="text-muted-foreground">{new Date(expense.date).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right font-mono">- ${expense.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-right font-mono">- {formatCurrency(expense.amount)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -70,7 +72,7 @@ export function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
         </Table>
       </div>
 
-      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -97,3 +99,4 @@ export function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
     </>
   );
 }
+

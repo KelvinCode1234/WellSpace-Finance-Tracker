@@ -1,8 +1,9 @@
+
 "use client"
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Landmark, ArrowRightLeft, PiggyBank, PlusCircle, LogOut } from 'lucide-react';
+import { Landmark, ArrowRightLeft, PiggyBank, PlusCircle, LogOut, Wallet } from 'lucide-react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { ExpenseForm } from './ExpenseForm';
 import { ExpenseList } from './ExpenseList';
@@ -18,7 +19,7 @@ interface DashboardProps {
 }
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+  return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(value);
 };
 
 export default function Dashboard({ onLogout }: DashboardProps) {
@@ -37,6 +38,25 @@ export default function Dashboard({ onLogout }: DashboardProps) {
 
   const totalExpenses = useMemo(() => expenses.reduce((sum, e) => sum + e.amount, 0), [expenses]);
   const balance = useMemo(() => income - totalExpenses, [income, totalExpenses]);
+
+  const monthlyExpenses = useMemo(() => {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    return expenses
+      .filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
+      })
+      .reduce((sum, e) => sum + e.amount, 0);
+  }, [expenses]);
+  
+  useEffect(() => {
+    setTempIncome(income);
+  }, [income]);
+  
+  useEffect(() => {
+    setTempSavingsGoal(savingsGoal);
+  }, [savingsGoal]);
 
   const handleSaveExpense = (expenseData: Expense) => {
     const existingIndex = expenses.findIndex(e => e.id === expenseData.id);
@@ -77,7 +97,10 @@ export default function Dashboard({ onLogout }: DashboardProps) {
     <>
       <div className="flex flex-col min-h-screen bg-background">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 sm:px-6 backdrop-blur">
-          <h1 className="text-xl font-semibold text-primary">WellSpace Finance Tracker</h1>
+          <div className="flex items-center gap-2">
+            <Wallet className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-semibold text-primary">WellSpace Finance Tracker</h1>
+          </div>
           <div className="ml-auto">
             <Button variant="ghost" size="icon" onClick={onLogout} aria-label="Log out">
               <LogOut className="h-5 w-5" />
@@ -104,8 +127,16 @@ export default function Dashboard({ onLogout }: DashboardProps) {
           </div>
           
           <div className="grid gap-6 lg:grid-cols-5">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
               <ExpenseChart expenses={expenses} />
+               <Card>
+                <CardHeader>
+                  <CardTitle>This Month's Expenses</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">{formatCurrency(monthlyExpenses)}</p>
+                </CardContent>
+              </Card>
             </div>
             <div className="lg:col-span-3 space-y-4">
               <div className="flex justify-between items-center">
@@ -114,10 +145,13 @@ export default function Dashboard({ onLogout }: DashboardProps) {
                   <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
                 </Button>
               </div>
-              <ExpenseList expenses={expenses} onEdit={handleEditExpense} onDelete={handleDeleteExpense} />
+              <ExpenseList expenses={expenses} onEdit={handleEditExpense} onDelete={handleDeleteExpense} formatCurrency={formatCurrency} />
             </div>
           </div>
         </main>
+        <footer className="mt-auto p-4 text-center text-muted-foreground text-sm">
+          © {new Date().getFullYear()} WellSpace Finance. All rights reserved.
+        </footer>
       </div>
 
       <ExpenseForm

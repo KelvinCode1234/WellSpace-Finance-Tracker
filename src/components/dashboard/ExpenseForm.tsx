@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useForm, type SubmitHandler } from "react-hook-form"
@@ -9,10 +10,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import type { Expense } from "@/lib/types"
+import { useState } from "react"
+import { suggestCategory } from "@/ai/flows/suggest-category-flow"
+import { useToast } from "@/hooks/use-toast"
 
 const expenseSchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -31,6 +35,9 @@ interface ExpenseFormProps {
 }
 
 export function ExpenseForm({ isOpen, setIsOpen, onSave, expenseToEdit }: ExpenseFormProps) {
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const { toast } = useToast();
+  
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
     defaultValues: expenseToEdit ? {
@@ -50,8 +57,42 @@ export function ExpenseForm({ isOpen, setIsOpen, onSave, expenseToEdit }: Expens
       ...data,
       date: format(data.date, "yyyy-MM-dd"),
     });
-    form.reset();
+    form.reset({
+      description: "",
+      amount: 0,
+      category: "",
+      date: new Date(),
+    });
     setIsOpen(false);
+  };
+  
+  const handleSuggestCategory = async () => {
+    const description = form.getValues("description");
+    if (!description) {
+      form.setError("description", { message: "Please enter a description first." });
+      return;
+    }
+    setIsSuggesting(true);
+    try {
+      const result = await suggestCategory(description);
+      if (result.category) {
+        form.setValue("category", result.category, { shouldValidate: true });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Couldn't suggest a category",
+          description: "We couldn't find a suitable category for this expense.",
+        });
+      }
+    } catch (error) {
+       toast({
+          variant: "destructive",
+          title: "AI Suggestion Failed",
+          description: "There was an error while getting an AI suggestion. Please try again.",
+        });
+    } finally {
+      setIsSuggesting(false);
+    }
   };
 
   return (
@@ -93,7 +134,19 @@ export function ExpenseForm({ isOpen, setIsOpen, onSave, expenseToEdit }: Expens
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                   <div className="flex justify-between items-center">
+                    <FormLabel>Category</FormLabel>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={handleSuggestCategory}
+                      disabled={isSuggesting}
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      {isSuggesting ? 'Suggesting...' : 'Suggest'}
+                    </Button>
+                  </div>
                   <FormControl>
                     <Input placeholder="e.g., Food" {...field} />
                   </FormControl>
