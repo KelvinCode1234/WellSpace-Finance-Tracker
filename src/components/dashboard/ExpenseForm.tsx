@@ -14,7 +14,7 @@ import { CalendarIcon, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import type { Expense } from "@/lib/types"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { suggestCategory } from "@/ai/flows/suggest-category-flow"
 import { useToast } from "@/hooks/use-toast"
 
@@ -40,16 +40,29 @@ export function ExpenseForm({ isOpen, setIsOpen, onSave, expenseToEdit }: Expens
   
   const form = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
-    defaultValues: expenseToEdit ? {
-      ...expenseToEdit,
-      date: new Date(expenseToEdit.date),
-    } : {
+    defaultValues: {
       description: "",
       amount: 0,
       category: "",
       date: new Date(),
     },
   });
+
+  useEffect(() => {
+    if (expenseToEdit) {
+      form.reset({
+        ...expenseToEdit,
+        date: new Date(expenseToEdit.date),
+      });
+    } else {
+      form.reset({
+        description: "",
+        amount: 0,
+        category: "",
+        date: new Date(),
+      });
+    }
+  }, [expenseToEdit, form]);
 
   const onSubmit: SubmitHandler<ExpenseFormData> = (data) => {
     onSave({
@@ -96,7 +109,17 @@ export function ExpenseForm({ isOpen, setIsOpen, onSave, expenseToEdit }: Expens
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      setIsOpen(open);
+      if (!open) {
+         form.reset({
+            description: "",
+            amount: 0,
+            category: "",
+            date: new Date(),
+          });
+      }
+    }}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{expenseToEdit ? "Edit Expense" : "Add New Expense"}</DialogTitle>
