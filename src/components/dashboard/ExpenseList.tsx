@@ -46,7 +46,11 @@ export function ExpenseList({ expenses, onEdit, onDelete, formatCurrency }: Expe
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-muted-foreground">{expense.category}</TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">{new Date(expense.date).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right font-mono">- {formatCurrency(expense.amount)}</TableCell>
+                  <TableCell className="text-right font-mono" style={{ fontFamily: 'NairaFont, sans-serif' }}>
+                    ₦{Number(expense.amount || 0).toLocaleString(undefined, {
+                      minimumFractionDigits: 2
+                    })}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -59,7 +63,7 @@ export function ExpenseList({ expenses, onEdit, onDelete, formatCurrency }: Expe
                           <Edit className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setDeleteId(expense.id)} className="text-destructive">
-                           <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
