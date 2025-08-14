@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: 'WellSpace Finance Tracker',
   description: 'Track your finances with WellSpace',
+  icons: {
+    icon: 'https://img.icons8.com/color/48/stack-of-money.png',
+  },
 };
 
 export default function RootLayout({
@@ -15,7 +18,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" href="https://img.icons8.com/color/48/stack-of-money.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet"></link>
